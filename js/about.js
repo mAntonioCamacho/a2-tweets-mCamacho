@@ -13,6 +13,18 @@ function parseTweets(runkeeper_tweets) {
 	//It works correctly, your task is to update the text of the other tags in the HTML file!
 	document.getElementById('numberTweets').innerText = tweet_array.length;	
 
+	updateTweetDates();
+	updateTweetCategory();
+
+}
+
+//Wait for the DOM to load
+document.addEventListener('DOMContentLoaded', function (event) {
+	loadSavedRunkeeperTweets().then(parseTweets);
+});
+
+function updateTweetDates() {
+	//Tweet Dates 1 point
 	var earliestTweet = tweet_array.reduce(
 		(earliest, current) => {
 			return current.time < earliest.time ? current : earliest;
@@ -33,7 +45,29 @@ function parseTweets(runkeeper_tweets) {
 	document.getElementById('lastDate').innerText = latestTweet.time.toLocaleDateString('en-us', dateFormat);
 }
 
-//Wait for the DOM to load
-document.addEventListener('DOMContentLoaded', function (event) {
-	loadSavedRunkeeperTweets().then(parseTweets);
-});
+function updateTweetCategory() {
+	// completed_events
+	var complete = 0;
+	tweet_array.forEach((tweet) => complete = (tweet.source === "completed_event") ? complete + 1 : complete);
+	document.getElementsByClassName("completedEvents")[0].innerText = complete;
+	document.getElementsByClassName("completedEvents")[1].innerText = complete;
+	document.getElementsByClassName("completedEventsPct")[0].innerText = ((complete / tweet_array.length) * 100).toFixed(2)+'%';
+
+	// achieved
+	var achieved = 0;
+	tweet_array.forEach((tweet) => achieved = (tweet.source === "achievement") ? achieved + 1 : achieved);
+	document.getElementsByClassName("achievements")[0].innerText = achieved;
+	document.getElementsByClassName("achievementsPct")[0].innerText = ((achieved / tweet_array.length) * 100).toFixed(2)+'%';
+
+	// live_events
+	var live = 0;
+	tweet_array.forEach((tweet) => live = (tweet.source === "live_event") ? live + 1 : live);
+	document.getElementsByClassName("liveEvents")[0].innerText = live;
+	document.getElementsByClassName("liveEventsPct")[0].innerText = ((live / tweet_array.length) * 100).toFixed(2)+'%';
+
+	// misc
+	var misc = 0;
+	tweet_array.forEach((tweet) => misc = (tweet.source === "miscellaneous") ? live + 1 : live);
+	document.getElementsByClassName("miscellaneous")[0].innerText = misc;
+	document.getElementsByClassName("miscellaneousPct")[0].innerText = ((misc / tweet_array.length) * 100).toFixed(2)+'%';
+}
