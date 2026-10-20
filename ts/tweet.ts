@@ -18,17 +18,26 @@ class Tweet {
 
     //returns a boolean, whether the text includes any content written by the person tweeting.
     get written():boolean {
-        //TODO: identify whether the tweet is written
-        // kind of same thing with source() | includes does find substrings "today I blah blah"
-        return false;
+        if(this.text.includes("Check it out!")) return false;
+        if(this.text.includes("TomTom MySports Watch")) return false;
+        if(this.text.includes("#RKLive")) return false;
+        if(this.text.includes("Distance...")) return false;
+        if(this.text.includes("I just set a goal")) return false;
+
+        return true;
     }
 
     get writtenText():string {
         if(!this.written) {
             return "";
         }
-        //TODO: parse the written text from the tweet
-        return "";
+        let index = this.text.indexOf("@Runkeeper");
+        if(index >= 0) { return this.text.slice(index + "@Runkeeper".length); }
+
+        index = this.text.indexOf("-");
+        if(index >= 0) { return this.text.slice(index + 1); }
+
+        return `ERROR: something happened original text here\n: ${this.text}`;
     }
 
     get activityType():string {

@@ -15,7 +15,7 @@ function parseTweets(runkeeper_tweets) {
 
 	updateTweetDates();
 	updateTweetCategory();
-
+	writtenTweets();
 }
 
 //Wait for the DOM to load
@@ -70,4 +70,16 @@ function updateTweetCategory() {
 	tweet_array.forEach((tweet) => misc = (tweet.source === "miscellaneous") ? live + 1 : live);
 	document.getElementsByClassName("miscellaneous")[0].innerText = misc;
 	document.getElementsByClassName("miscellaneousPct")[0].innerText = ((misc / tweet_array.length) * 100).toFixed(2)+'%';
+}
+
+function writtenTweets() {
+	//tweet_array.forEach((tweet) => { console.log(tweet.writtenText); });
+
+	var complete = 0;
+	var counter = 0;
+	tweet_array.forEach((tweet) => complete = (tweet.source === "completed_event") ? complete + 1 : complete);
+	tweet_array.forEach((tweet) =>  counter = (tweet.writtenText != "") ? counter + 1 : counter);
+
+	document.getElementsByClassName("written")[0].innerText = counter;
+	document.getElementsByClassName("writtenPct")[0].innerText = ((counter/complete) * 100).toFixed(2)+'%';
 }
