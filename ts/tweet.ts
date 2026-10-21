@@ -40,18 +40,35 @@ class Tweet {
     }
 
     get activityType():string {
-        if (this.source != 'completed_event') {
-            return "unknown";
+        if (this.source !== 'completed_event') {
+            return "unknown"; // this was 'unknown'
         }
-        //TODO: parse the activity type from the text of the tweet
+        
+        var text_words = this.text.toLowerCase().split(" ");
+        if(text_words.includes("run")) return "run";
+        if(text_words.includes("walk")) return "walk";
+        if(text_words.includes("elliptical")) return "elliptical";
+        if(text_words.includes("bike")) return "bike";
+        if(text_words.includes("swim")) return "swim";
+        if(text_words.includes("row")) return "row";
+        if(text_words.includes("hike")) return "hike";
+        if(text_words.includes("skate")) return "skate";
         return "";
     }
 
     get distance():number {
-        if(this.source != 'completed_event') {
+        if(this.source !== 'completed_event') {
             return 0;
         }
         //TODO: prase the distance from the text of the tweet
+        if(this.activityType === "") return 0;
+        var text_words = this.text.toLowerCase().split(" ");
+        var index = text_words.findIndex((word) => word === "mi" || word === "km");
+        
+        if(index > 0) {
+            if(text_words[index] === "km") return Number(text_words[index - 1]) / 1.609344;
+            return Number(text_words[index - 1]);
+        }
         return 0;
     }
 

@@ -21,8 +21,8 @@ function parseTweets(runkeeper_tweets) {
 	  }
 	  //TODO: Add mark and encoding
 	};
-	vegaEmbed('#activityVis', activity_vis_spec, {actions:false});
-
+	//vegaEmbed('#activityVis', activity_vis_spec, {actions:false});
+	displayTweets();
 	//TODO: create the visualizations which group the three most-tweeted activities by the day of the week.
 	//Use those visualizations to answer the questions about which activities tended to be longest and when.
 }
@@ -32,11 +32,12 @@ document.addEventListener('DOMContentLoaded', function (event) {
 	loadSavedRunkeeperTweets().then(parseTweets);
 });
 
-function getCompleted() {
-	var complete = 0;
-	tweet_array.forEach((tweet) => complete = (tweet.source === "completed_event") ? complete + 1 : complete);
-	// want to parse for km and mi for distance based activities from complete events
-	// want to get activities and place them into a map that contains the amount of times a certain
-	// word has been found so {run : 112039} {walk: 293020} etc
-	// this gives me activity type and their associated logged tweet count - count for graph and top 3 
+function displayTweets() {
+	tweet_array.forEach((text) => {
+		const triple = {
+			activity: text.activityType,
+			distance: text.distance,
+		};
+		console.log(triple);
+	});
 }
