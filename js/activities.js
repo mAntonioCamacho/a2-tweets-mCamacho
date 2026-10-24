@@ -71,25 +71,97 @@ function parseTweets(runkeeper_tweets) {
 		//console.log(weekdayAvg, weekendAvg);
 	document.getElementById("weekdayOrWeekendLonger").innerText = (weekdayAvg > weekendAvg) ? "Weekday" : "Weekend"
 
+	counts_arr = [...counts].map(([activity, count]) => ({activity,count}));
+	// bruh - why is that info at the bottom in canvas - all that work is staying
 	activity_vis_spec = {
 	  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
 	  "description": "A graph of the number of Tweets containing each type of activity.",
 	  "data": {
-	    "values": tweet_array
+	    "values": counts_arr
 	  },
-	  "mark": "tick",
+	  "mark": "bar",
 	  "encoding": {
 		x: {
-			field: "heli",
+			field: "activity",
+			type: "nominal"
+		},
+		y: {
+			field: "count",
 			type: "quantitative"
 		}
 	  }
-	//TODO: Add mark and encoding
-
 	};
 	vegaEmbed('#activityVis', activity_vis_spec, {actions:false});
+	
 	//TODO: create the visualizations which group the three most-tweeted activities by the day of the week.
 	//Use those visualizations to answer the questions about which activities tended to be longest and when.
+	dist_act_day_arr = activity_arr.filter(obj => obj.activity === "run" || obj.activity === "walk" || obj.activity === "bike")
+	.map(obj => ({
+		activity: obj.activity,
+		distance: obj.distance,
+		day: obj.day
+	}));
+
+	distance_vis_spec = {
+	  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+	  "description": "",
+	  "data": {
+	    "values": dist_act_day_arr
+	  },
+	  "mark": "point",
+	  "encoding": {
+		x: {
+			field: "day",
+			type: "ordinal"
+		},
+		y: {
+			field: "distance",
+			type: "quantitative"
+		},
+		color: {
+			field: "activity",
+			type: "nominal"
+		}
+	  }
+	};
+
+	distance_agg_vis_spec = {
+	  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+	  "description": "",
+	  "data": {
+	    "values": dist_act_day_arr
+	  },
+	  "mark": "point",
+	  "encoding": {
+		x: {
+			field: "day",
+			type: "ordinal"
+		},
+		y: {
+			field: "distance",
+			type: "quantitative",
+			aggregate: "mean"
+		},
+		color: {
+			field: "activity",
+			type: "nominal"
+		}
+	  }
+	};
+
+	let aggregated = false;
+	vegaEmbed('#distanceVis', distance_vis_spec, {actions: false});
+	document.getElementById("aggregate").addEventListener("click", () => { 
+		aggregated = !aggregated;
+		if(aggregated) {
+			vegaEmbed('#distanceVis', distance_vis_spec, {actions: false});
+		}
+		else {
+			vegaEmbed('#distanceVis', distance_agg_vis_spec, {actions: false});
+		}
+
+	});
+
 }
 
 //Wait for the DOM to load
@@ -102,7 +174,8 @@ function makeActivityArray() {
 		return {
 			activity: tweet.activityType,
 			distance: tweet.distance,
-			weekend: tweet.time.getDay() === 0 || tweet.time.getDay() === 6
+			weekend: tweet.time.getDay() === 0 || tweet.time.getDay() === 6,
+			day: tweet.time.getDay()
 		};
 	});
 	return activities;
